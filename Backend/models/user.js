@@ -12,13 +12,13 @@ const userSchema = new mongoose.Schema({
 });
 
 // Generación del jwt
-userSchema.methods.generateJWT = () => {
+userSchema.methods.generateJWT = function () {
     return jwt.sign({
         _id: this._id,
         name: this.name,
         iat: moment().unix()
     },
-    "SalomeTeAmo"
+    "MARC1996"
     );
 };
 

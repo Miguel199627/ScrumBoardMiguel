@@ -5,6 +5,7 @@ const mongoose = require("mongoose");
 // Importamos rutas
 const User = require("./routes/user");
 const Auth = require("./routes/auth");
+const Board = require("./routes/board");
 
 // Variable app la cual ejecutara nuestra aplicación
 const app = express();
@@ -13,6 +14,7 @@ const app = express();
 app.use(express.json());
 app.use("/api/user/", User);
 app.use("/api/auth/", Auth);
+app.use("/api/board/", Board);
 
 // Tipos de puerto que tiene nuestra aplicacion ( Left: Hosting and Right: Local )
 const port = process.env.PORT || 3001;
