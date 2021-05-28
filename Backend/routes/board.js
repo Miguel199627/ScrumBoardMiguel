@@ -1,49 +1,51 @@
-// Importamos modulos
+/**
+ * Descripcion: Sección del tablero de scrum
+ * Autor: Miguel Angel Cerquera R
+ * Fecha modificacion: 28/05/2021
+ */
+
 const express = require("express");
 const router = express.Router();
 const Board = require("../models/board");
 const User = require("../models/user");
 const Auth = require("../middleware/auth");
 
-// Registrar una actividad sin imagen - async await POST
-// Ruta completa: http://localhost:3001/api/board/saveTask
+// Guardar tareas
 router.post("/saveTask", Auth, async (req, res) => {
-    // Buscamos el usuario de la petición
     const user = await User.findById(req.user._id);
-    // Si no se encuentra el usuario
     if (!user) return res.status(400).send("Usuario no autenticado");
-    // Si el usuario existe procedemos a registrar
+
+    const valiRes = valiCampos(req.body);
+    if (valiRes) return res.status(400).send(valiRes);
+
     const board = new Board({
         userId: user._id,
         name: req.body.name,
         description: req.body.description,
         status: "to-do"
     });
-    // Guardamos en MongoDB
     const result = await board.save();
     return res.status(200).send({ result });
 });
 
-// Consultar todas las actividades - async await GET
-// Ruta completa: http://localhost:3001/api/board/listTask
+// Listar tareas
 router.get("/listTask", Auth, async (req, res) => {
-    // Buscamos usuario de la petición
     const user = await User.findById(req.user._id);
-    // Si no se encuentra el usuario
     if (!user) return res.status(400).send("Usuario no autenticado");
-    // Si el usuario existe procedemos a listar
+
     const board = await Board.find({ userId: req.user._id });
     return res.status(200).send({ board });
 });
 
-// Editar una actividad - async await PUT
-// Ruta completa: http://localhost:3001/api/board/updateTask
+// Actualizar tareas
 router.put("/updateTask", Auth, async (req, res) => {
-    // Buscamos usuario de la petición
     const user = await User.findById(req.user._id);
-    // Si no se encuentra el usuario
     if (!user) return res.status(400).send("Usuario no autenticado");
-    // Si el usuario existe procedemos a editar
+
+    const valiRes = valiCampos(req.body);
+    if (valiRes) return res.status(400).send(valiRes);
+    if(!req.body.status) return res.status(400).send("Faltan campos");
+
     const board = await Board.findByIdAndUpdate(req.body._id, {
         userId: user._id, 
         name: req.body.name,
@@ -54,18 +56,21 @@ router.put("/updateTask", Auth, async (req, res) => {
     return res.status(200).send({ board });
 });
 
-// Eliminar una tarea - async await DELETE
-// Ruta completa: http://localhost:3001/api/board/:_id
+// Eliminar tareas
 router.delete("/:_id", Auth, async (req, res) => {
-    // Buscamos usuario de la petición
     const user = await User.findById(req.user._id);
-    // Si no se encuentra el usuario
     if (!user) return res.status(400).send("Usuario no autenticado");
-    // Si el usuario existe procedemos a eliminar
+
     const board = await Board.findByIdAndDelete(req.params._id);
     if (!board) return res.status(400).send("no se pudo eliminar la actividad");
     return res.status(200).send("Actividad eliminada");
 });
 
-// Exportamos el modulo
+// Validar campos generales resividos en el body
+const valiCampos = (body) => {
+    if(Object.keys(body).length === 0) return "No vienen campos";
+    if(!body.name || !body.description) return "Faltan campos";
+    return false;
+};
+
 module.exports = router;
