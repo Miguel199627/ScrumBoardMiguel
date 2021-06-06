@@ -1,24 +1,28 @@
-// Importamos modulos necesarios
+/**
+ * Descripcion: Routes of auth
+ * Author: Miguel Angel Cerquera R
+ * Updated date: 3/06/2021
+ */
+
 const express = require("express");
 const router = express.Router();
-const User = require("../models/user");
 const bcrypt = require("bcrypt");
+const User = require("../models/user");
 
-// Login del usuario - async await POST
-// Ruta completa: http://localhost:3001/api/auth/login
 router.post("/login", async (req, res) => {
-    // Buscamos el correo del usuario
-    let user = await User.findOne({ email: req.body.email });
-    // Validamos si el correo trae o no resultados
-    if (!user) return res.status(400).send("Email o password incorrectos");
-    // Comparamos el password que ingreso el usuario con el de la db
-    const hash = await bcrypt.compare(req.body.password, user.password);
-    // Validamos si el password coincide o no
-    if (!hash) return res.status(400).send("Email o password incorrectos");
-    // Devolvemos el token
+  const user = await User.findOne({ email: req.body.email });
+  if (!user) return res.status(400).send("Incorrect email or password");
+
+  const hash = await bcrypt.compare(req.body.password, user.password);
+  if (!user.status || !hash)
+    return res.status(400).send("Incorrect email or password");
+
+  try {
     const jwtToken = user.generateJWT();
-    return res.status(200).send({ jwtToken });
+    res.status(200).send({ jwtToken });
+  } catch (e) {
+    res.status(400).send("Login error");
+  }
 });
 
-// Exportamos el modulo
 module.exports = router;

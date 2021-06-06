@@ -1,29 +1,28 @@
-// Importamos modulos necesarios
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
 const moment = require("moment");
 
-// Creación del esquema de colección
-const userSchema = new mongoose.Schema({
-    name: String,
-    email: String,
-    password: String,
-    date: { type: Date, default: Date.now() }
+const Schema = new mongoose.Schema({
+  name: String,
+  email: String,
+  password: String,
+  roleId: { type: mongoose.Schema.ObjectId, ref: "role" },
+  status: { type: Boolean, default: true },
+  created_at: { type: Date, default: Date.now() },
 });
 
-// Generación del jwt
-userSchema.methods.generateJWT = function () {
-    return jwt.sign({
-        _id: this._id,
-        name: this.name,
-        iat: moment().unix()
+Schema.methods.generateJWT = function () {
+  return jwt.sign(
+    {
+      _id: this._id,
+      name: this.name,
+      email: this.email,
+      roleId: this.roleId,
+      iat: moment().unix(),
     },
-    "MARC1996"
-    );
+    process.env.SECRET_kEY_JWT
+  );
 };
 
-// Informamos a MongoDB cual sera su esquema de colección
-const User = mongoose.model("user", userSchema);
-
-// Exportamos el modulo al backend
+const User = mongoose.model("user", Schema);
 module.exports = User;
