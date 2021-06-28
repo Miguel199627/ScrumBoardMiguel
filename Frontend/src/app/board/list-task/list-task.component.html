@@ -65,32 +65,37 @@
             </mat-panel-title>
           </mat-expansion-panel-header>
           <mat-panel-description>
-              {{ task.description }}
+            {{ task.description }}
+          </mat-panel-description>
+          <mat-panel-description class="justify-content-center">
+            <img src="{{ task.imageUrl }}" alt="Img" />
           </mat-panel-description>
           <mat-action-row>
-              <button
+            <button
               class="btnSelectInProgress"
               mat-button
               (click)="updateTask(task, 'in-progress')"
-              >
-                in-progress
-              </button>
-              <button
+            >
+              in-progress
+            </button>
+            <button
               class="btnSelectDone"
               mat-button
               (click)="updateTask(task, 'done')"
-              >
-                done
-              </button>
-              <button
+            >
+              done
+            </button>
+            <button
               class="btnSelectToDo"
               mat-button
               (click)="updateTask(task, 'to-do')"
-              >
-                to-do
-              </button>
-              <span class="spacer"></span>
-              <mat-icon color="primary" (click)="deleteTask(task)">delete</mat-icon>
+            >
+              to-do
+            </button>
+            <span class="spacer"></span>
+            <mat-icon color="primary" (click)="deleteTask(task)"
+              >delete</mat-icon
+            >
           </mat-action-row>
         </mat-expansion-panel>
       </mat-accordion>
